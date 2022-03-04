@@ -5,7 +5,6 @@ output:
     css: style.css 
     logo: MR_Stacked.png
     orientation: rows
-    social: menu
     vertical_layout: scroll
     theme: 
       version: 4
