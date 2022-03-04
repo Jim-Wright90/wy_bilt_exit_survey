@@ -2,8 +2,17 @@
 title: "WY BILT Exit Survey"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    css: style.css 
+    logo: MR_Stacked.png
+    orientation: rows
+    social: menu
+    vertical_layout: scroll
+    theme: 
+      version: 4
+      bg: "#101010"
+      fg: "#101010" 
+      primary: "#ED79F9"
+      navbar-bg: "#3ADAC6"
 ---
 
 ```{r setup, include=FALSE}
