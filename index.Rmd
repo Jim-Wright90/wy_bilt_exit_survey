@@ -14,6 +14,11 @@ output:
       navbar-bg: "#3ADAC6"
 ---
 
+<script>
+$('.navbar-logo').wrap('<a href="https://www.marzanoresearch.com/" target=_blank>');
+</script>
+
+
 ```{r setup, include=FALSE}
 library(flexdashboard)
 ```
