@@ -6,6 +6,11 @@ output:
     logo: MR_Stacked.png
     orientation: rows
     vertical_layout: scroll
+    navbar:
+      - { icon: "fa-twitter", href: "https://twitter.com/MarzanoResearch", align: right }
+      - { icon: "fa-linkedin", href: "https://www.linkedin.com/company/marzano-research/", align: right }
+      - { icon: "fa-facebook", href: "https://www.facebook.com/MarzanoResearch/", align: right }
+      - { icon: "fa-envelope", href: "https://www.marzanoresearch.com/contact", align: right}
     theme: 
       version: 4
       bg: "#101010"
