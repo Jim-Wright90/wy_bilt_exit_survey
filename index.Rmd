@@ -3,7 +3,7 @@ title: "WY BILT Exit Survey"
 output: 
   flexdashboard::flex_dashboard:
     css: style.css 
-    logo: MR_Stacked.png
+    logo: MR_Stacked_wht.png
     orientation: rows
     vertical_layout: scroll
     navbar:
@@ -11,17 +11,20 @@ output:
       - { icon: "fa-linkedin", href: "https://www.linkedin.com/company/marzano-research/", align: right }
       - { icon: "fa-facebook", href: "https://www.facebook.com/MarzanoResearch/", align: right }
       - { icon: "fa-envelope", href: "https://www.marzanoresearch.com/contact", align: right}
+      - {title: "Marzano Research", href: "https://www.marzanoresearch.com/", align: right}
     theme: 
       version: 4
-      bg: "#101010"
-      fg: "#101010" 
+      bg: "#ffffff"
+      fg: "#ffffff" 
       primary: "#ED79F9"
-      navbar-bg: "#3ADAC6"
+      navbar-bg: "#495E82"
 ---
 
 <script>
 $('.navbar-logo').wrap('<a href="https://www.marzanoresearch.com/" target=_blank>');
 </script>
+
+
 
 
 ```{r setup, include=FALSE}
