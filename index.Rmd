@@ -15,7 +15,7 @@ output:
     theme: 
       version: 4
       bg: "#ffffff"
-      fg: "#ffffff" 
+      fg: "#101010" 
       primary: "#ED79F9"
       navbar-bg: "#495E82"
 ---
@@ -31,27 +31,258 @@ $('.navbar-logo').wrap('<a href="https://www.marzanoresearch.com/" target=_blank
 library(flexdashboard)
 ```
 
-Column {data-width=650}
+```{r, include=FALSE}
+library(tidyverse)
+library(here)
+library(janitor)
+library(rio)
+library(colorblindr)
+library(gghighlight)
+library(forcats)
+library(ggrepel)
+library(gt)
+library(knitr)
+library(kableExtra)
+library(reactable)
+library(plotly)
+library(glue)
+library(fs)
+library(rstatix)
+library(ggpubr)
+library(writexl)
+library(remotes)
+library(profvis)
+
+theme_set(theme_minimal(15) +
+            theme(legend.position = "bottom",
+                  panel.grid.major.x = element_line(colour = "gray60"),
+                  panel.grid.minor.x = element_blank(),
+                  panel.grid.major.y = element_blank())
+          )
+
+```
+
+```{r, include=FALSE}
+wy_bilt <- import(here("data", "wy_bilt.sav"),
+               setclass = "tbl_df") %>% 
+  characterize() %>% 
+  janitor::clean_names() %>% 
+  mutate(response_id = as.factor(response_id))
+
+wy_bilt[sapply(wy_bilt, is.character)] <- lapply(wy_bilt[sapply(wy_bilt, is.character)],
+                                                 as.factor)
+
+str(wy_bilt)
+
+district_list <- import(here("data", "wy_bilt_district_list.xlsx"),
+                        setclass = "tbl_df")
+```
+
+
+# Demographics 
+
+
+Row {.tabset}
 -----------------------------------------------------------------------
 
-### Chart A
+### Role
 
-```{r}
+```{r, include=FALSE}
+names(wy_bilt)
 
+wy_demo <- wy_bilt %>% 
+  select(survey_number, response_id, q_8) %>% 
+  group_by(q_8) %>% 
+  count()
+
+demo_tbl <- wy_demo %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE
+  )
 ```
 
-Column {data-width=350}
+```{r, include=TRUE}
+demo_tbl
+```
+
+
+Row {.tabset}
 -----------------------------------------------------------------------
 
-### Chart B
+### District
 
-```{r}
+```{r, include=FALSE}
+wy_district <- wy_bilt %>% 
+  select(survey_number, response_id, q_9)
+
+wy_district$q_9 <- factor(wy_district$q_9, levels = c("Converse County School District 1",
+                                                      "Fremont County School District 24",
+                                                      "Goshen County School District 1",
+                                                      "Laramie County School District 2",
+                                                      "Lincoln County School District 1",
+                                                      "Niobrara County School District 1",
+                                                      "Park County School District 6",
+                                                      "Platte County School District 2",
+                                                      "Sweetwater County School District 1",
+                                                      "Uinta County School District 6"))
+
+
+wy_district_count <- wy_district %>% 
+  group_by(q_9) %>% 
+  count()
+
+dist_tbl <- wy_district_count %>% 
+  reactable(
+    columns = list(
+      q_9 = colDef(name = "School District",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+dist_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Grades Worked With
+
+```{r, include=FALSE}
+
+wy_grade <- wy_bilt %>% 
+  select(survey_number, response_id, 27:42) %>% 
+  group_by() 
+
+wy_grade_long <- wy_grade %>% 
+  pivot_longer(
+    cols = c(3:18),
+    names_to = "grade",
+    names_prefix = "q_10_",
+    values_to = "response"
+  )
+
+wy_grade_count <- wy_grade_long %>% 
+  group_by(grade) %>% 
+  count(response) %>% 
+  filter(response == "Yes")
+
+str(wy_grade_count)
+
+wy_grade_count$grade <- factor(wy_grade_count$grade, levels = c("prek",
+                                                                "k",
+                                                                "g1",
+                                                                "g2",
+                                                                "g3",
+                                                                "g4",
+                                                                "g5",
+                                                                "g6",
+                                                                "g7",
+                                                                "g8",
+                                                                "g9",
+                                                                "g10",
+                                                                "g11",
+                                                                "g12",
+                                                                "other"))
+
+levels(wy_grade_count$grade) <- c("PreK",
+                                  "K",
+                                  "1st",
+                                  "2nd",
+                                  "3rd",
+                                  "4th",
+                                  "5th",
+                                  "6th",
+                                  "7th",
+                                  "8th",
+                                  "9th",
+                                  "10th",
+                                  "11th",
+                                  "12th",
+                                  "Other")
+
+wy_grade_count$grade <- factor(wy_grade_count$grade, levels = c("PreK",
+                                  "K",
+                                  "1st",
+                                  "2nd",
+                                  "3rd",
+                                  "4th",
+                                  "5th",
+                                  "6th",
+                                  "7th",
+                                  "8th",
+                                  "9th",
+                                  "10th",
+                                  "11th",
+                                  "12th",
+                                  "Other"))
+
+grade_tbl <- wy_grade_count %>% 
+  select(grade, n) %>% 
+  reactable(
+    columns = list(
+      grade = colDef(name = "Grade",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+grade_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Please select the main literacy issue(s) addressed by the WY BILT training or technical assistance (Select all that apply)
+
+```{r, include=FALSE}
+q_2_tbl <- wy_bilt %>% 
+  select(survey_number, response_id, q_2) %>% 
+  group_by(q_2) %>% 
+  count() %>% 
+  reactable(
+      columns = list(
+      q_2 = colDef(name = "Response",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE
+  )
 
 ```
 
-### Chart C
-
-```{r}
-
+```{r, include=TRUE}
+q_2_tbl
 ```
+
+# Feedback
 
