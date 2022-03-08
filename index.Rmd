@@ -85,7 +85,8 @@ district_list <- import(here("data", "wy_bilt_district_list.xlsx"),
 Row {.tabset}
 -----------------------------------------------------------------------
 
-### Role
+### Role 
+
 
 ```{r, include=FALSE}
 names(wy_bilt)
@@ -115,10 +116,9 @@ demo_tbl
 ```
 
 
-Row {.tabset}
------------------------------------------------------------------------
 
-### District
+
+### District 
 
 ```{r, include=FALSE}
 wy_district <- wy_bilt %>% 
@@ -160,10 +160,9 @@ dist_tbl <- wy_district_count %>%
 dist_tbl
 ```
 
-Row {.tabset}
------------------------------------------------------------------------
 
-### Grades Worked With
+
+### Grades Worked With 
 
 ```{r, include=FALSE}
 
@@ -284,5 +283,19 @@ q_2_tbl <- wy_bilt %>%
 q_2_tbl
 ```
 
-# Feedback
+# Survey Feedback
+
+Sidebar {.sidebar}
+------------
+
+Survey responses on this tab correspond to the following prompt: As a result of the WY BILT training/technical assistance...
+
+
+# Survey Feedback 
+
+Sidebar {.sidebar}
+------------
+
+Survey responses on this tab correspond to the following prompt: Please indicate your level of agreement with the following statements
+
 
