@@ -16,7 +16,6 @@ output:
       version: 4
       bg: "#ffffff"
       fg: "#101010" 
-      primary: "#ED79F9"
       navbar-bg: "#495E82"
 ---
 
@@ -24,6 +23,16 @@ output:
 $('.navbar-logo').wrap('<a href="https://www.marzanoresearch.com/" target=_blank>');
 </script>
 
+
+<style>
+.nav-tabs-custom .nav-tabs li.active a {
+  color: black;
+}
+
+.nav-tabs-custom .nav-tabs li:not(.active) a {
+  color: black;
+}
+</style>
 
 
 
@@ -79,7 +88,7 @@ district_list <- import(here("data", "wy_bilt_district_list.xlsx"),
 ```
 
 
-# Demographics 
+# Demographics {data-icon="fa-id-card"}
 
 
 Row {.tabset}
@@ -283,19 +292,372 @@ q_2_tbl <- wy_bilt %>%
 q_2_tbl
 ```
 
-# Survey Feedback
+# Survey Feedback {data-icon="fa-chart-bar"}
 
 Sidebar {.sidebar}
 ------------
 
 Survey responses on this tab correspond to the following prompt: As a result of the WY BILT training/technical assistance...
 
+```{r, include=FALSE}
+q_3_df <- function(df, a, b, c) {
+  df %>% 
+    select({{a}}, {{b}}, {{c}}) %>% 
+    count({{c}})
+}
 
-# Survey Feedback 
+q_3_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_1)
+
+q_3_sv_resp1 <- c("Strongly disagree",
+                  "Disagree",
+                  "Agree",
+                  "Strongly agree",
+                  "Not applicable because it was not covered in the training")
+
+q_3_sv_resp2 <- c("Not applicable because it\n was not covered in the training",
+                  "Strongly agree",
+                  "Agree",
+                  "Disagree",
+                  "Strongly disagree")
+
+
+q_3_resp_plot <- function(df, a, b) {
+ggplot(df, aes({{a}}, {{b}})) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_3_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  labs(x = "",
+       y = "Total Number of Responses")
+}
+
+q_3_resp_plot(q_3_1_res, q_3_1, n)
+```
+
+Row 
+-----------------------------------------------------------------------
+
+### I have **increased knowledge** of how to address literacy issues. 
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_1_res, q_3_1, n))
+```
+
+Row 
+-----------------------------------------------------------------------
+
+### I have an **increased awareness** of resources to address literacy issues.
+
+```{r, include=FALSE}
+q_3_2_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_2)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_2_res, q_3_2, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### I am better able to **use resources** to address literacy issues.
+
+```{r, include=FALSE}
+q_3_3_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_3)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_3_res, q_3_3, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### I have an **increased capacity** to provide high-quality literacy support for all students.
+
+```{r, include=FALSE}
+q_3_4_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_4)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_4_res, q_3_4, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### I intend to **change educational practices** related to the training. 
+
+```{r, include=FALSE}
+q_3_5_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_5)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_5_res, q_3_5, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### I intend to **change classroom or school policies** related to the training. 
+
+```{r, include=FALSE}
+q_3_6_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_6)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_6_res, q_3_6, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### Overall, I found this event useful.
+
+```{r, include=FALSE}
+q_3_7_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_7)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_7_res, q_3_7, n))
+```
+
+
+# Survey Feedback {data-icon="fa-chart-bar"}
 
 Sidebar {.sidebar}
 ------------
 
 Survey responses on this tab correspond to the following prompt: Please indicate your level of agreement with the following statements
 
+```{r, include=FALSE}
+q_4_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_1)
 
+q_4_sv_resp1 <- c("Strongly disagree",
+                  "Disagree",
+                  "Agree",
+                  "Strongly agree")
+
+q_4_sv_resp2 <- c("Strongly agree",
+                  "Agree",
+                  "Disagree",
+                  "Strongly disagree")
+
+
+q_4_resp_plot <- function(df, a, b) {
+ggplot(df, aes({{a}}, {{b}})) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_4_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  labs(x = "",
+       y = "Total Number of Responses")
+}
+
+q_4_resp_plot(q_4_1_res, q_4_1, n)
+
+```
+
+Row 
+-----------------------------------------------------------------------
+
+### The goal or purpose of the training/activity was clearly stated at or before the beginning of the event. 
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_1_res, q_4_1, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### The structure of the training/activity was appropriate for meeting the stated goals.
+
+```{r, include=FALSE}
+q_4_2_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_2)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_2_res, q_4_2, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### The training/activity was relevant to a literacy issue or problem currently facing my school/district
+
+```{r, include=FALSE}
+q_4_3_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_3)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_3_res, q_4_3, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### The presenter/trainer was knowledgeable or experienced with the topic addressed. 
+
+```{r, include=FALSE}
+q_4_4_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_4)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_4_res, q_4_4, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### I am satisfied with the overall quality of this training/activity. 
+
+```{r, include=FALSE}
+q_4_5_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_5)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_5_res, q_4_5, n))
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### I would recommend the training to other potential participants. 
+
+```{r, include=FALSE}
+q_4_6_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_6)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_6_res, q_4_6, n))
+```
+
+
+# Additional Comments {data-icon="fa-comment"}
+
+Sidebar {.sidebar}
+------------
+
+The data tables on this page detail descriptive responses for each individual who completed the survey: 
+
+  1. What useful information and/or practical techniques did you learn as a result of this training/activity? 
+  2. What about the content of this training/activity could be changed to improve it?
+  3. As a result of this training/activity, what steps do you plan to take? What changes do you plan to implement? 
+
+```{r, include=FALSE}
+q_5_7_df <- function(df, a, b, c) {
+  df %>% 
+    select({{a}}, {{b}}, {{c}}) 
+}
+
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### What useful information and/or practical techniques did you learn as a result of this training activity?
+
+```{r, include=FALSE}
+q_5_res <- q_5_7_df(wy_bilt, survey_number, q_8, q_5)
+
+q_5_tbl <- q_5_res %>% 
+    reactable(
+     columns = list(
+     survey_number = colDef(name = "Respondent",
+                   align = "center"),
+     q_8 = colDef(name = "Position/Role",
+                  align = "center"),
+      q_5 = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+q_5_tbl
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### What about the content of this training/activity could be changed to improve it?
+
+```{r, include=FALSE}
+q_6_res <- q_5_7_df(wy_bilt, survey_number, q_8, q_6)
+
+q_6_tbl <- q_6_res %>% 
+    reactable(
+     columns = list(
+     survey_number = colDef(name = "Respondent",
+                   align = "center"),
+     q_8 = colDef(name = "Position/Role",
+                  align = "center"),
+      q_6 = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+q_6_tbl
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### As a result of this training/activity, what steps do you plan to take? What changes do you plan to implement? 
+
+```{r, include=FALSE}
+q_7_res <- q_5_7_df(wy_bilt, survey_number, q_8, q_7)
+
+q_7_tbl <- q_7_res %>% 
+    reactable(
+     columns = list(
+     survey_number = colDef(name = "Respondent",
+                   align = "center"),
+     q_8 = colDef(name = "Position/Role",
+                  align = "center"),
+      q_7 = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+q_7_tbl
+```
