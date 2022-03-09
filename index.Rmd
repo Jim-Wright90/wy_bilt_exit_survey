@@ -32,6 +32,7 @@ $('.navbar-logo').wrap('<a href="https://www.marzanoresearch.com/" target=_blank
 .nav-tabs-custom .nav-tabs li:not(.active) a {
   color: black;
 }
+
 </style>
 
 
