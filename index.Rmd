@@ -95,8 +95,7 @@ district_list <- import(here("data", "wy_bilt_district_list.xlsx"),
 Row {.tabset}
 -----------------------------------------------------------------------
 
-### Role 
-
+### Position/Role
 
 ```{r, include=FALSE}
 names(wy_bilt)
@@ -124,8 +123,6 @@ demo_tbl <- wy_demo %>%
 ```{r, include=TRUE}
 demo_tbl
 ```
-
-
 
 
 ### District 
@@ -171,7 +168,6 @@ dist_tbl
 ```
 
 
-
 ### Grades Worked With 
 
 ```{r, include=FALSE}
@@ -195,8 +191,8 @@ wy_grade_count <- wy_grade_long %>%
 
 str(wy_grade_count)
 
-wy_grade_count$grade <- factor(wy_grade_count$grade, levels = c("prek",
-                                                                "k",
+wy_grade_count$grade <- factor(wy_grade_count$grade, levels = c("preK",
+                                                                "K",
                                                                 "g1",
                                                                 "g2",
                                                                 "g3",
@@ -267,16 +263,20 @@ grade_tbl
 Row {.tabset}
 -----------------------------------------------------------------------
 
-### Please select the main literacy issue(s) addressed by the WY BILT training or technical assistance (Select all that apply)
+### Training Attended 
 
 ```{r, include=FALSE}
-q_2_tbl <- wy_bilt %>% 
-  select(survey_number, response_id, q_2) %>% 
-  group_by(q_2) %>% 
-  count() %>% 
+names(wy_bilt)
+
+training_attended <- wy_bilt %>% 
+  select(survey_number, response_id, training_type) %>% 
+  group_by(training_type) %>% 
+  count()
+
+attend_tbl <- training_attended %>% 
   reactable(
-      columns = list(
-      q_2 = colDef(name = "Response",
+    columns = list(
+    training_type = colDef(name = "Training",
                    align = "center"),
       n = colDef(name = "Total",
                  align = "center")),
@@ -286,11 +286,40 @@ q_2_tbl <- wy_bilt %>%
     highlight = TRUE,
     bordered = TRUE
   )
-
 ```
 
 ```{r, include=TRUE}
-q_2_tbl
+attend_tbl
+```
+
+
+### Training Date
+
+```{r, include=FALSE}
+train_date <- wy_bilt %>% 
+  select(survey_number, response_id, training_date, training_type) %>% 
+  group_by(training_date, training_type) %>% 
+  count()
+
+train_date_tbl <- train_date %>% 
+  reactable(
+    columns = list(
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE)
+```
+
+
+```{r, include=TRUE}
+train_date_tbl
 ```
 
 # Survey Feedback {data-icon="fa-chart-bar"}
@@ -898,9 +927,9 @@ The data tables on this page detail descriptive responses for each individual wh
   3. As a result of this training/activity, what steps do you plan to take? What changes do you plan to implement? 
 
 ```{r, include=FALSE}
-q_5_7_df <- function(df, a, b, c) {
+q_5_7_df <- function(df, a, b) {
   df %>% 
-    select({{a}}, {{b}}, {{c}}) 
+    select({{a}}, {{b}}) 
 }
 
 ```
@@ -912,15 +941,13 @@ Row
 ### What useful information and/or practical techniques did you learn as a result of this training activity?
 
 ```{r, include=FALSE}
-q_5_res <- q_5_7_df(wy_bilt, survey_number, q_8, q_5)
+q_5_res <- q_5_7_df(wy_bilt, survey_number, q_5)
 
 q_5_tbl <- q_5_res %>% 
     reactable(
      columns = list(
      survey_number = colDef(name = "Respondent",
                    align = "center"),
-     q_8 = colDef(name = "Position/Role",
-                  align = "center"),
       q_5 = colDef(name = "Total",
                  align = "center")),
     striped = TRUE,
@@ -943,15 +970,13 @@ Row
 ### What about the content of this training/activity could be changed to improve it?
 
 ```{r, include=FALSE}
-q_6_res <- q_5_7_df(wy_bilt, survey_number, q_8, q_6)
+q_6_res <- q_5_7_df(wy_bilt, survey_number, q_6)
 
 q_6_tbl <- q_6_res %>% 
     reactable(
      columns = list(
      survey_number = colDef(name = "Respondent",
                    align = "center"),
-     q_8 = colDef(name = "Position/Role",
-                  align = "center"),
       q_6 = colDef(name = "Total",
                  align = "center")),
     striped = TRUE,
@@ -974,15 +999,13 @@ Row
 ### As a result of this training/activity, what steps do you plan to take? What changes do you plan to implement? 
 
 ```{r, include=FALSE}
-q_7_res <- q_5_7_df(wy_bilt, survey_number, q_8, q_7)
+q_7_res <- q_5_7_df(wy_bilt, survey_number, q_7)
 
 q_7_tbl <- q_7_res %>% 
     reactable(
      columns = list(
      survey_number = colDef(name = "Respondent",
                    align = "center"),
-     q_8 = colDef(name = "Position/Role",
-                  align = "center"),
       q_7 = colDef(name = "Total",
                  align = "center")),
     striped = TRUE,
