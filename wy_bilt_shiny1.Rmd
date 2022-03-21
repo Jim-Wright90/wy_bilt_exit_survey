@@ -1,23 +1,36 @@
 ---
 title: "WY BILT Exit Survey"
-runtime: shiny 
-output: 
+runtime: shiny
+output:
   flexdashboard::flex_dashboard:
-    css: style.css 
+    css: style.css
     logo: MR_Stacked_wht.png
     orientation: rows
     vertical_layout: scroll
     navbar:
-      - { icon: "fa-twitter", href: "https://twitter.com/MarzanoResearch", align: right }
-      - { icon: "fa-linkedin", href: "https://www.linkedin.com/company/marzano-research/", align: right }
-      - { icon: "fa-facebook", href: "https://www.facebook.com/MarzanoResearch/", align: right }
-      - { icon: "fa-envelope", href: "https://www.marzanoresearch.com/contact", align: right}
-      - {title: "Marzano Research", href: "https://www.marzanoresearch.com/", align: right}
-    theme: 
+    - icon: fa-twitter
+      href: https://twitter.com/MarzanoResearch
+      align: right
+    - icon: fa-linkedin
+      href: https://www.linkedin.com/company/marzano-research/
+      align: right
+    - icon: fa-facebook
+      href: https://www.facebook.com/MarzanoResearch/
+      align: right
+    - icon: fa-envelope
+      href: https://www.marzanoresearch.com/contact
+      align: right
+    - title: Marzano Research
+      href: https://www.marzanoresearch.com/
+      align: right
+    theme:
       version: 4
-      bg: "#ffffff"
-      fg: "#101010" 
-      navbar-bg: "#495E82"
+      bg: '#ffffff'
+      fg: '#101010'
+      navbar-bg: '#495E82'
+resource_files:
+- data/wy_bilt.sav
+- data/wy_bilt_district_list.xlsx
 ---
 
 <script>
@@ -382,31 +395,18 @@ q_3_1_res <- q_3_df(wy_bilt,
   rename("response" = q_3_1)
 
 
-q_3_sv_resp1 <- c("Strongly disagree",
+q_3_sv_resp1 <- c("Strongly Disagree",
                   "Disagree",
                   "Agree",
-                  "Strongly agree",
+                  "Strongly Agree",
                   "Not applicable because it was not covered in the training")
 
 q_3_sv_resp2 <- c("Not applicable because it\n was not covered in the training",
-                  "Strongly agree",
+                  "Strongly Agree",
                   "Agree",
                   "Disagree",
-                  "Strongly disagree")
+                  "Strongly Disagree")
 
-
-q_3_resp_plot <- function(df, a, b) {
-ggplot(df, aes({{a}}, {{b}})) +
-  geom_col(fill = "#495E82") +
-  scale_x_discrete(limits = q_3_sv_resp2) +
-  scale_y_continuous(limits = c(0, 15),
-                     breaks = c(0, 5, 10, 15)) +
-  coord_flip() +
-  labs(x = "",
-       y = "Total Number of Responses")
-}
-
-q_3_resp_plot(q_3_1_res, response, n)
 ```
 
 ```{r, include=FALSE}
@@ -429,44 +429,9 @@ survey_plot_q3 <- function(df) {
 
 
 ```{r, include=FALSE}
-smry_df <- function(df, a, b, c, d, e) {
-  df %>% 
-  select({{a}}, {{b}}, {{c}}, {{d}}, {{e}}) %>% 
-    group_by({{c}}, {{d}}, {{e}}) %>% 
-    count({{e}})
-}
-
-q_3_1_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_1) %>% 
-  rename("response" = q_3_1)
-
-# q_3_1_smry_tbl <- q_3_1_smry %>% 
-#   reactable(
-#     columns = list(
-#       training_date = colDef(name = "Date",
-#                              align = "center"),
-#       training_type = colDef(name = "Training",
-#                              align = "center"),
-#       q_3_1 = colDef(name = "Response",
-#                      align = "center"),
-#       n = colDef(name = "Total",
-#                  align = "center")),
-#     striped = TRUE,
-#     outlined = TRUE,
-#     compact = TRUE,
-#     highlight = TRUE,
-#     bordered = TRUE,
-#     searchable = TRUE)
-```
-
-```{r, include=FALSE}
 smry_tbl <- function(df) {
   df %>% 
-    group_by_at({{input$training1}}) %>% 
+    filter(training_type %in% input$training1) %>% 
     reactable(
       defaultColDef = colDef(align = "center"),
       columns = list(
@@ -495,7 +460,7 @@ survey_plot_q3(q_3_1_res)
 ### Summary 
 
 ```{r, include=TRUE}
-renderReactable(smry_tbl(q_3_1_smry))
+renderReactable(smry_tbl(q_3_1_res))
 ```
 
 
@@ -521,35 +486,8 @@ survey_plot_q3(q_3_2_res)
 
 ### Summary 
 
-```{r, include=FALSE}
-q_3_2_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_2)
-
-q_3_2_smry_tbl <- q_3_2_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_3_2 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_3_2_smry_tbl
+renderReactable(smry_tbl(q_3_2_res))
 ```
 
 Row {.tabset}
@@ -558,45 +496,24 @@ Row {.tabset}
 ### I am better able to **use resources** to address literacy issues.
 
 ```{r, include=FALSE}
-q_3_3_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_3)
+q_3_3_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_3_3) %>% 
+  rename("response" = q_3_3)
 ```
 
 
 ```{r, include=TRUE}
-ggplotly(q_3_resp_plot(q_3_3_res, q_3_3, n))
+survey_plot_q3(q_3_3_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_3_3_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_3)
-
-q_3_3_smry_tbl <- q_3_3_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_3_3 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_3_3_smry_tbl
+renderReactable(smry_tbl(q_3_3_res))
 ```
 
 Row {.tabset}
@@ -605,45 +522,24 @@ Row {.tabset}
 ### I have an **increased capacity** to provide high-quality literacy support for all students.
 
 ```{r, include=FALSE}
-q_3_4_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_4)
+q_3_4_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_3_4) %>% 
+  rename("response" = q_3_4)
 ```
 
 
 ```{r, include=TRUE}
-ggplotly(q_3_resp_plot(q_3_4_res, q_3_4, n))
+survey_plot_q3(q_3_4_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_3_4_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_4)
-
-q_3_4_smry_tbl <- q_3_4_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_3_4 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_3_4_smry_tbl
+renderReactable(smry_tbl(q_3_4_res))
 ```
 
 Row {.tabset}
@@ -652,45 +548,24 @@ Row {.tabset}
 ### I intend to **change educational practices** related to the training. 
 
 ```{r, include=FALSE}
-q_3_5_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_5)
+q_3_5_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_3_5) %>% 
+  rename("response" = q_3_5)
 ```
 
 
 ```{r, include=TRUE}
-ggplotly(q_3_resp_plot(q_3_5_res, q_3_5, n))
+survey_plot_q3(q_3_5_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_3_5_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_5)
-
-q_3_5_smry_tbl <- q_3_5_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_3_5 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_3_5_smry_tbl
+renderReactable(smry_tbl(q_3_5_res))
 ```
 
 Row {.tabset}
@@ -699,45 +574,24 @@ Row {.tabset}
 ### I intend to **change classroom or school policies** related to the training. 
 
 ```{r, include=FALSE}
-q_3_6_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_6)
+q_3_6_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_3_6) %>% 
+  rename("response" = q_3_6)
 ```
 
 
 ```{r, include=TRUE}
-ggplotly(q_3_resp_plot(q_3_6_res, q_3_6, n))
+survey_plot_q3(q_3_6_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_3_6_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_6)
-
-q_3_6_smry_tbl <- q_3_6_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_3_6 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_3_6_smry_tbl
+renderReactable(smry_tbl(q_3_6_res))
 ```
 
 Row {.tabset}
@@ -746,45 +600,24 @@ Row {.tabset}
 ### Overall, I found this event useful.
 
 ```{r, include=FALSE}
-q_3_7_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_7)
+q_3_7_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_3_7) %>% 
+  rename("response" = q_3_7)
 ```
 
 
 ```{r, include=TRUE}
-ggplotly(q_3_resp_plot(q_3_7_res, q_3_7, n))
+survey_plot_q3(q_3_7_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_3_7_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_3_7)
-
-q_3_7_smry_tbl <- q_3_7_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_3_7 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_3_7_smry_tbl
+renderReactable(smry_tbl(q_3_7_res))
 ```
 
 # Survey Feedback {data-icon="fa-chart-bar"}
@@ -794,34 +627,72 @@ Sidebar {.sidebar}
 
 Survey responses on this tab correspond to the following prompt: Please indicate your level of agreement with the following statements
 
+```{r, include=TRUE}
+selectInput("training2",
+            "Training:",
+            choices = levels(wy_bilt$training_type))
+```
+
 ```{r, include=FALSE}
-q_4_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_1)
+q_4_1_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_4_1) %>% 
+  rename("response" = q_4_1)
 
-q_4_sv_resp1 <- c("Strongly disagree",
+q_4_sv_resp1 <- c("Strongly Disagree",
                   "Disagree",
                   "Agree",
-                  "Strongly agree")
+                  "Strongly Agree")
 
-q_4_sv_resp2 <- c("Strongly agree",
+q_4_sv_resp2 <- c("Strongly Agree",
                   "Agree",
                   "Disagree",
-                  "Strongly disagree")
-
-
-q_4_resp_plot <- function(df, a, b) {
-ggplot(df, aes({{a}}, {{b}})) +
-  geom_col(fill = "#495E82") +
-  scale_x_discrete(limits = q_4_sv_resp2) +
-  scale_y_continuous(limits = c(0, 15),
-                     breaks = c(0, 5, 10, 15)) +
-  coord_flip() +
-  labs(x = "",
-       y = "Total Number of Responses")
-}
-
-q_4_resp_plot(q_4_1_res, q_4_1, n)
+                  "Strongly Disagree")
 
 ```
+
+
+```{r, include=FALSE}
+survey_plot_q4 <- function(df) {
+  renderPlotly({
+    df %>% 
+      filter(training_type %in% input$training2) %>% 
+      ggplot(aes(response, n)) +
+      geom_col(fill = "#495E82") +
+      scale_x_discrete(limits = q_4_sv_resp2) +
+      scale_y_continuous(limits = c(0, 15),
+                        breaks = c(0, 5, 10, 15)) +
+      coord_flip() +
+      labs(x = "",
+           y = "Total Number of Responses")
+  })
+}
+
+```
+
+```{r, include=FALSE}
+smry_tbl2 <- function(df) {
+  df %>% 
+    filter(training_type %in% input$training2) %>% 
+    reactable(
+      defaultColDef = colDef(align = "center"),
+      columns = list(
+        training_date = colDef(name = "Date"),
+        training_type = colDef(name = "Training"),
+        response = colDef(name = "Response"),
+        n = colDef(name = "Total")),
+        striped = TRUE,
+        outlined = TRUE,
+        compact = TRUE,
+        highlight = TRUE,
+        bordered = TRUE,
+        searchable = TRUE)
+}
+```
+
 
 Row {.tabset}
 -----------------------------------------------------------------------
@@ -829,40 +700,13 @@ Row {.tabset}
 ### The goal or purpose of the training/activity was clearly stated at or before the beginning of the event. 
 
 ```{r, include=TRUE}
-ggplotly(q_4_resp_plot(q_4_1_res, q_4_1, n))
+survey_plot_q4(q_4_1_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_4_1_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_4_1)
-
-q_4_1_smry_tbl <- q_4_1_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_4_1 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_4_1_smry_tbl
+renderReactable(smry_tbl2(q_4_1_res))
 ```
 
 Row {.tabset}
@@ -871,44 +715,23 @@ Row {.tabset}
 ### The structure of the training/activity was appropriate for meeting the stated goals.
 
 ```{r, include=FALSE}
-q_4_2_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_2)
+q_4_2_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_4_2) %>% 
+  rename("response" = q_4_2)
 ```
 
 ```{r, include=TRUE}
-ggplotly(q_4_resp_plot(q_4_2_res, q_4_2, n))
+survey_plot_q4(q_4_2_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_4_2_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_4_2)
-
-q_4_2_smry_tbl <- q_4_2_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_4_2 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_4_2_smry_tbl
+renderReactable(smry_tbl2(q_4_2_res))
 ```
 
 Row {.tabset}
@@ -917,44 +740,23 @@ Row {.tabset}
 ### The training/activity was relevant to a literacy issue or problem currently facing my school/district
 
 ```{r, include=FALSE}
-q_4_3_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_3)
+q_4_3_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_4_3) %>% 
+  rename("response" = q_4_3)
 ```
 
 ```{r, include=TRUE}
-ggplotly(q_4_resp_plot(q_4_3_res, q_4_3, n))
+survey_plot_q4(q_4_3_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_4_3_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_4_3)
-
-q_4_3_smry_tbl <- q_4_3_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_4_3 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_4_3_smry_tbl
+renderReactable(smry_tbl2(q_4_3_res))
 ```
 
 Row {.tabset}
@@ -963,44 +765,23 @@ Row {.tabset}
 ### The presenter/trainer was knowledgeable or experienced with the topic addressed. 
 
 ```{r, include=FALSE}
-q_4_4_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_4)
+q_4_4_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_4_4) %>% 
+  rename("response" = q_4_4)
 ```
 
 ```{r, include=TRUE}
-ggplotly(q_4_resp_plot(q_4_4_res, q_4_4, n))
+survey_plot_q4(q_4_4_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_4_4_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_4_4)
-
-q_4_4_smry_tbl <- q_4_4_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_4_4 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_4_4_smry_tbl
+renderReactable(smry_tbl2(q_4_4_res))
 ```
 
 Row {.tabset}
@@ -1009,44 +790,23 @@ Row {.tabset}
 ### I am satisfied with the overall quality of this training/activity. 
 
 ```{r, include=FALSE}
-q_4_5_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_5)
+q_4_5_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_4_5) %>% 
+  rename("response" = q_4_5)
 ```
 
 ```{r, include=TRUE}
-ggplotly(q_4_resp_plot(q_4_5_res, q_4_5, n))
+survey_plot_q4(q_4_5_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_4_5_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_4_5)
-
-q_4_5_smry_tbl <- q_4_5_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_4_5 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_4_5_smry_tbl
+renderReactable(smry_tbl2(q_4_5_res))
 ```
 
 Row {.tabset}
@@ -1055,44 +815,23 @@ Row {.tabset}
 ### I would recommend the training to other potential participants. 
 
 ```{r, include=FALSE}
-q_4_6_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_6)
+q_4_6_res <- q_3_df(wy_bilt,
+                    survey_number, 
+                    response_id, 
+                    training_date,
+                    training_type,
+                    q_4_6) %>% 
+  rename("response" = q_4_6)
 ```
 
 ```{r, include=TRUE}
-ggplotly(q_4_resp_plot(q_4_6_res, q_4_6, n))
+survey_plot_q4(q_4_6_res)
 ```
 
 ### Summary 
 
-```{r, include=FALSE}
-q_4_6_smry <- smry_df(wy_bilt,
-                      survey_number,
-                      response_id,
-                      training_date,
-                      training_type,
-                      q_4_6)
-
-q_4_6_smry_tbl <- q_4_6_smry %>% 
-  reactable(
-    columns = list(
-      training_date = colDef(name = "Date",
-                             align = "center"),
-      training_type = colDef(name = "Training",
-                             align = "center"),
-      q_4_6 = colDef(name = "Response",
-                     align = "center"),
-      n = colDef(name = "Total",
-                 align = "center")),
-    striped = TRUE,
-    outlined = TRUE,
-    compact = TRUE,
-    highlight = TRUE,
-    bordered = TRUE,
-    searchable = TRUE)
-```
-
 ```{r, include=TRUE}
-q_4_6_smry_tbl
+renderReactable(smry_tbl2(q_4_6_res))
 ```
 
 # Additional Comments {data-icon="fa-comment"}

@@ -708,15 +708,15 @@ Survey responses on this tab correspond to the following prompt: Please indicate
 ```{r, include=FALSE}
 q_4_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_1)
 
-q_4_sv_resp1 <- c("Strongly disagree",
+q_4_sv_resp1 <- c("Strongly Disagree",
                   "Disagree",
                   "Agree",
-                  "Strongly agree")
+                  "Strongly Agree")
 
-q_4_sv_resp2 <- c("Strongly agree",
+q_4_sv_resp2 <- c("Strongly Agree",
                   "Agree",
                   "Disagree",
-                  "Strongly disagree")
+                  "Strongly Disagree")
 
 
 q_4_resp_plot <- function(df, a, b) {
