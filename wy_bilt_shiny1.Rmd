@@ -1,0 +1,1051 @@
+---
+title: "WY BILT Exit Survey"
+runtime: shiny 
+output: 
+  flexdashboard::flex_dashboard:
+    css: style.css 
+    logo: MR_Stacked_wht.png
+    orientation: rows
+    vertical_layout: scroll
+    navbar:
+      - { icon: "fa-twitter", href: "https://twitter.com/MarzanoResearch", align: right }
+      - { icon: "fa-linkedin", href: "https://www.linkedin.com/company/marzano-research/", align: right }
+      - { icon: "fa-facebook", href: "https://www.facebook.com/MarzanoResearch/", align: right }
+      - { icon: "fa-envelope", href: "https://www.marzanoresearch.com/contact", align: right}
+      - {title: "Marzano Research", href: "https://www.marzanoresearch.com/", align: right}
+    theme: 
+      version: 4
+      bg: "#ffffff"
+      fg: "#101010" 
+      navbar-bg: "#495E82"
+---
+
+<script>
+$('.navbar-logo').wrap('<a href="https://www.marzanoresearch.com/" target=_blank>');
+</script>
+
+
+<style>
+.nav-tabs-custom .nav-tabs li.active a {
+  color: black;
+}
+
+.nav-tabs-custom .nav-tabs li:not(.active) a {
+  color: black;
+}
+
+</style>
+
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(here)
+library(janitor)
+library(rio)
+library(colorblindr)
+library(gghighlight)
+library(forcats)
+library(ggrepel)
+library(gt)
+library(knitr)
+library(kableExtra)
+library(reactable)
+library(plotly)
+library(glue)
+library(fs)
+library(rstatix)
+library(ggpubr)
+library(writexl)
+library(remotes)
+library(profvis)
+
+theme_set(theme_minimal(15) +
+            theme(legend.position = "bottom",
+                  panel.grid.major.x = element_line(colour = "gray60"),
+                  panel.grid.minor.x = element_blank(),
+                  panel.grid.major.y = element_blank())
+          )
+
+```
+
+```{r, include=FALSE}
+wy_bilt <- import(here("data", "wy_bilt.sav"),
+               setclass = "tbl_df") %>% 
+  characterize() %>% 
+  janitor::clean_names() %>% 
+  mutate(response_id = as.factor(response_id))
+
+wy_bilt[sapply(wy_bilt, is.character)] <- lapply(wy_bilt[sapply(wy_bilt, is.character)],
+                                                 as.factor)
+
+str(wy_bilt)
+
+district_list <- import(here("data", "wy_bilt_district_list.xlsx"),
+                        setclass = "tbl_df")
+```
+
+
+# Demographics {data-icon="fa-id-card"}
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Position/Role
+
+```{r, include=FALSE}
+names(wy_bilt)
+
+wy_demo <- wy_bilt %>% 
+  select(survey_number, response_id, q_8) %>% 
+  group_by(q_8) %>% 
+  count()
+
+demo_tbl <- wy_demo %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE
+  )
+```
+
+```{r, include=TRUE}
+demo_tbl
+```
+
+
+### District 
+
+```{r, include=FALSE}
+wy_district <- wy_bilt %>% 
+  select(survey_number, response_id, q_9)
+
+wy_district$q_9 <- factor(wy_district$q_9, levels = c("Converse County School District 1",
+                                                      "Fremont County School District 24",
+                                                      "Goshen County School District 1",
+                                                      "Laramie County School District 2",
+                                                      "Lincoln County School District 1",
+                                                      "Niobrara County School District 1",
+                                                      "Park County School District 6",
+                                                      "Platte County School District 2",
+                                                      "Sweetwater County School District 1",
+                                                      "Uinta County School District 6"))
+
+
+wy_district_count <- wy_district %>% 
+  group_by(q_9) %>% 
+  count()
+
+dist_tbl <- wy_district_count %>% 
+  reactable(
+    columns = list(
+      q_9 = colDef(name = "School District",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+dist_tbl
+```
+
+
+### Grades Worked With 
+
+```{r, include=FALSE}
+
+wy_grade <- wy_bilt %>% 
+  select(survey_number, response_id, 27:42) %>% 
+  group_by() 
+
+wy_grade_long <- wy_grade %>% 
+  pivot_longer(
+    cols = c(3:18),
+    names_to = "grade",
+    names_prefix = "q_10_",
+    values_to = "response"
+  )
+
+wy_grade_count <- wy_grade_long %>% 
+  group_by(grade) %>% 
+  count(response) %>% 
+  filter(response == "Yes")
+
+str(wy_grade_count)
+
+wy_grade_count$grade <- factor(wy_grade_count$grade, levels = c("preK",
+                                                                "K",
+                                                                "g1",
+                                                                "g2",
+                                                                "g3",
+                                                                "g4",
+                                                                "g5",
+                                                                "g6",
+                                                                "g7",
+                                                                "g8",
+                                                                "g9",
+                                                                "g10",
+                                                                "g11",
+                                                                "g12",
+                                                                "other"))
+
+levels(wy_grade_count$grade) <- c("PreK",
+                                  "K",
+                                  "1st",
+                                  "2nd",
+                                  "3rd",
+                                  "4th",
+                                  "5th",
+                                  "6th",
+                                  "7th",
+                                  "8th",
+                                  "9th",
+                                  "10th",
+                                  "11th",
+                                  "12th",
+                                  "Other")
+
+wy_grade_count$grade <- factor(wy_grade_count$grade, levels = c("PreK",
+                                  "K",
+                                  "1st",
+                                  "2nd",
+                                  "3rd",
+                                  "4th",
+                                  "5th",
+                                  "6th",
+                                  "7th",
+                                  "8th",
+                                  "9th",
+                                  "10th",
+                                  "11th",
+                                  "12th",
+                                  "Other"))
+
+grade_tbl <- wy_grade_count %>% 
+  select(grade, n) %>% 
+  reactable(
+    columns = list(
+      grade = colDef(name = "Grade",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+grade_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Training Attended 
+
+```{r, include=FALSE}
+names(wy_bilt)
+
+training_attended <- wy_bilt %>% 
+  select(survey_number, response_id, training_type) %>% 
+  group_by(training_type) %>% 
+  count()
+
+attend_tbl <- training_attended %>% 
+  reactable(
+    columns = list(
+    training_type = colDef(name = "Training",
+                   align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE
+  )
+```
+
+```{r, include=TRUE}
+attend_tbl
+```
+
+
+### Training Date
+
+```{r, include=FALSE}
+train_date <- wy_bilt %>% 
+  select(survey_number, response_id, training_date, training_type) %>% 
+  group_by(training_date, training_type) %>% 
+  count()
+
+train_date_tbl <- train_date %>% 
+  reactable(
+    columns = list(
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE)
+```
+
+
+```{r, include=TRUE}
+train_date_tbl
+```
+
+# Survey Feedback {data-icon="fa-chart-bar"}
+
+Sidebar {.sidebar}
+------------
+
+Survey responses on this tab correspond to the following prompt: As a result of the WY BILT training/technical assistance...
+
+```{r, include=FALSE}
+question_3 <- wy_bilt %>% 
+  pivot_longer(
+    cols = c(11:17),
+    names_to = "question_3_prompts",
+    values_to = "response"
+  ) 
+
+question_3 <- question_3 %>% 
+  mutate(question_3_prompts = recode(question_3_prompts, 
+                            `q_3_1` = "I have increased knowledge of how to address literacy issues",
+                            `q_3_2` = "I have an increased awareness of resources to address literacy issues",
+                            `q_3_3` = "I am better able to use resources to address literacy issues",
+                            `q_3_4` = "I have an increased capacity to provide high-quality literacy support for all students",
+                            `q_3_5` = "I intend to change educational practices related to the training",
+                            `q_3_6` = "I intend to change classroom or school policies related to the training",
+                            `q_3_7` = "Overall, I found this event useful"))
+
+```
+
+```{r, include=TRUE}
+selectInput("prompts",
+            "Select Prompt:",
+            choices = levels(question_3$question_3_prompts))
+```
+
+
+```{r, include=FALSE}
+q_3_df <- function(df, a, b, c) {
+  df %>% 
+    select({{a}}, {{b}}, {{c}}) %>% 
+    count({{c}})
+}
+
+q_3_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_1)
+
+q_3_sv_resp1 <- c("Strongly disagree",
+                  "Disagree",
+                  "Agree",
+                  "Strongly agree",
+                  "Not applicable because it was not covered in the training")
+
+q_3_sv_resp2 <- c("Not applicable because it\n was not covered in the training",
+                  "Strongly agree",
+                  "Agree",
+                  "Disagree",
+                  "Strongly disagree")
+
+
+q_3_resp_plot <- function(df, a, b) {
+ggplot(df, aes({{a}}, {{b}})) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_3_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  labs(x = "",
+       y = "Total Number of Responses")
+}
+
+q_3_resp_plot(q_3_1_res, q_3_1, n)
+```
+
+```{r, include=FALSE}
+smry_df <- function(df, a, b, c, d) {
+  df %>% 
+  select({{a}}, {{b}}, {{c}}, {{d}}) %>% 
+    group_by({{c}}, {{d}}) %>% 
+    count({{c}}, {{d}})
+}
+
+q_3_1_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_1)
+
+q_3_1_smry_tbl <- q_3_1_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_1 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I have **increased knowledge** of how to address literacy issues. 
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_1_res, q_3_1, n))
+```
+
+### Summary 
+
+```{r, include=TRUE}
+q_3_1_smry_tbl
+```
+
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I have an **increased awareness** of resources to address literacy issues.
+
+```{r, include=FALSE}
+q_3_2_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_2)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_2_res, q_3_2, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_3_2_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_2)
+
+q_3_2_smry_tbl <- q_3_2_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_2 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_3_2_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I am better able to **use resources** to address literacy issues.
+
+```{r, include=FALSE}
+q_3_3_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_3)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_3_res, q_3_3, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_3_3_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_3)
+
+q_3_3_smry_tbl <- q_3_3_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_3 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_3_3_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I have an **increased capacity** to provide high-quality literacy support for all students.
+
+```{r, include=FALSE}
+q_3_4_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_4)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_4_res, q_3_4, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_3_4_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_4)
+
+q_3_4_smry_tbl <- q_3_4_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_4 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_3_4_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I intend to **change educational practices** related to the training. 
+
+```{r, include=FALSE}
+q_3_5_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_5)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_5_res, q_3_5, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_3_5_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_5)
+
+q_3_5_smry_tbl <- q_3_5_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_5 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_3_5_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I intend to **change classroom or school policies** related to the training. 
+
+```{r, include=FALSE}
+q_3_6_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_6)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_6_res, q_3_6, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_3_6_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_6)
+
+q_3_6_smry_tbl <- q_3_6_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_6 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_3_6_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Overall, I found this event useful.
+
+```{r, include=FALSE}
+q_3_7_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_7)
+```
+
+
+```{r, include=TRUE}
+ggplotly(q_3_resp_plot(q_3_7_res, q_3_7, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_3_7_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_7)
+
+q_3_7_smry_tbl <- q_3_7_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_3_7 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_3_7_smry_tbl
+```
+
+# Survey Feedback {data-icon="fa-chart-bar"}
+
+Sidebar {.sidebar}
+------------
+
+Survey responses on this tab correspond to the following prompt: Please indicate your level of agreement with the following statements
+
+```{r, include=FALSE}
+q_4_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_1)
+
+q_4_sv_resp1 <- c("Strongly disagree",
+                  "Disagree",
+                  "Agree",
+                  "Strongly agree")
+
+q_4_sv_resp2 <- c("Strongly agree",
+                  "Agree",
+                  "Disagree",
+                  "Strongly disagree")
+
+
+q_4_resp_plot <- function(df, a, b) {
+ggplot(df, aes({{a}}, {{b}})) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_4_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  labs(x = "",
+       y = "Total Number of Responses")
+}
+
+q_4_resp_plot(q_4_1_res, q_4_1, n)
+
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### The goal or purpose of the training/activity was clearly stated at or before the beginning of the event. 
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_1_res, q_4_1, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_4_1_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_1)
+
+q_4_1_smry_tbl <- q_4_1_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_4_1 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_4_1_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### The structure of the training/activity was appropriate for meeting the stated goals.
+
+```{r, include=FALSE}
+q_4_2_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_2)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_2_res, q_4_2, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_4_2_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_2)
+
+q_4_2_smry_tbl <- q_4_2_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_4_2 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_4_2_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### The training/activity was relevant to a literacy issue or problem currently facing my school/district
+
+```{r, include=FALSE}
+q_4_3_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_3)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_3_res, q_4_3, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_4_3_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_3)
+
+q_4_3_smry_tbl <- q_4_3_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_4_3 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_4_3_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### The presenter/trainer was knowledgeable or experienced with the topic addressed. 
+
+```{r, include=FALSE}
+q_4_4_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_4)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_4_res, q_4_4, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_4_4_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_4)
+
+q_4_4_smry_tbl <- q_4_4_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_4_4 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_4_4_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I am satisfied with the overall quality of this training/activity. 
+
+```{r, include=FALSE}
+q_4_5_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_5)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_5_res, q_4_5, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_4_5_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_5)
+
+q_4_5_smry_tbl <- q_4_5_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_4_5 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_4_5_smry_tbl
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### I would recommend the training to other potential participants. 
+
+```{r, include=FALSE}
+q_4_6_res <- q_3_df(wy_bilt, survey_number, response_id, q_4_6)
+```
+
+```{r, include=TRUE}
+ggplotly(q_4_resp_plot(q_4_6_res, q_4_6, n))
+```
+
+### Summary 
+
+```{r, include=FALSE}
+q_4_6_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_6)
+
+q_4_6_smry_tbl <- q_4_6_smry %>% 
+  reactable(
+    columns = list(
+      q_8 = colDef(name = "Position/Role",
+                   align = "center"),
+      q_4_6 = colDef(name = "Response",
+                     align = "center"),
+      n = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE)
+```
+
+```{r, include=TRUE}
+q_4_6_smry_tbl
+```
+
+# Additional Comments {data-icon="fa-comment"}
+
+Sidebar {.sidebar}
+------------
+
+The data tables on this page detail descriptive responses for each individual who completed the survey: 
+
+  1. What useful information and/or practical techniques did you learn as a result of this training/activity? 
+  2. What about the content of this training/activity could be changed to improve it?
+  3. As a result of this training/activity, what steps do you plan to take? What changes do you plan to implement? 
+
+```{r, include=FALSE}
+q_5_7_df <- function(df, a, b) {
+  df %>% 
+    select({{a}}, {{b}}) 
+}
+
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### What useful information and/or practical techniques did you learn as a result of this training activity?
+
+```{r, include=FALSE}
+q_5_res <- q_5_7_df(wy_bilt, survey_number, q_5)
+
+q_5_tbl <- q_5_res %>% 
+    reactable(
+     columns = list(
+     survey_number = colDef(name = "Respondent",
+                   align = "center"),
+      q_5 = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+q_5_tbl
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### What about the content of this training/activity could be changed to improve it?
+
+```{r, include=FALSE}
+q_6_res <- q_5_7_df(wy_bilt, survey_number, q_6)
+
+q_6_tbl <- q_6_res %>% 
+    reactable(
+     columns = list(
+     survey_number = colDef(name = "Respondent",
+                   align = "center"),
+      q_6 = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+q_6_tbl
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+### As a result of this training/activity, what steps do you plan to take? What changes do you plan to implement? 
+
+```{r, include=FALSE}
+q_7_res <- q_5_7_df(wy_bilt, survey_number, q_7)
+
+q_7_tbl <- q_7_res %>% 
+    reactable(
+     columns = list(
+     survey_number = colDef(name = "Respondent",
+                   align = "center"),
+      q_7 = colDef(name = "Total",
+                 align = "center")),
+    striped = TRUE,
+    outlined = TRUE,
+    compact = TRUE,
+    highlight = TRUE,
+    bordered = TRUE,
+    searchable = TRUE
+  )
+```
+
+```{r, include=TRUE}
+q_7_tbl
+```

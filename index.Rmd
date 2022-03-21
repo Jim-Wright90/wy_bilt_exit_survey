@@ -366,20 +366,27 @@ q_3_resp_plot(q_3_1_res, q_3_1, n)
 ```
 
 ```{r, include=FALSE}
-smry_df <- function(df, a, b, c, d) {
+smry_df <- function(df, a, b, c, d, e) {
   df %>% 
-  select({{a}}, {{b}}, {{c}}, {{d}}) %>% 
-    group_by({{c}}, {{d}}) %>% 
-    count({{c}}, {{d}})
+  select({{a}}, {{b}}, {{c}}, {{d}}, {{e}}) %>% 
+    group_by({{c}}, {{d}}, {{e}}) %>% 
+    count({{e}})
 }
 
-q_3_1_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_1)
+q_3_1_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_1)
 
 q_3_1_smry_tbl <- q_3_1_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_1 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -426,13 +433,20 @@ ggplotly(q_3_resp_plot(q_3_2_res, q_3_2, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_3_2_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_2)
+q_3_2_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_2)
 
 q_3_2_smry_tbl <- q_3_2_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_2 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -466,13 +480,20 @@ ggplotly(q_3_resp_plot(q_3_3_res, q_3_3, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_3_3_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_3)
+q_3_3_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_3)
 
 q_3_3_smry_tbl <- q_3_3_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_3 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -506,13 +527,20 @@ ggplotly(q_3_resp_plot(q_3_4_res, q_3_4, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_3_4_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_4)
+q_3_4_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_4)
 
 q_3_4_smry_tbl <- q_3_4_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_4 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -546,13 +574,20 @@ ggplotly(q_3_resp_plot(q_3_5_res, q_3_5, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_3_5_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_5)
+q_3_5_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_5)
 
 q_3_5_smry_tbl <- q_3_5_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_5 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -586,13 +621,20 @@ ggplotly(q_3_resp_plot(q_3_6_res, q_3_6, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_3_6_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_6)
+q_3_6_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_6)
 
 q_3_6_smry_tbl <- q_3_6_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_6 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -626,13 +668,20 @@ ggplotly(q_3_resp_plot(q_3_7_res, q_3_7, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_3_7_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_3_7)
+q_3_7_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_3_7)
 
 q_3_7_smry_tbl <- q_3_7_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_3_7 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -697,13 +746,20 @@ ggplotly(q_4_resp_plot(q_4_1_res, q_4_1, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_4_1_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_1)
+q_4_1_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_4_1)
 
 q_4_1_smry_tbl <- q_4_1_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_4_1 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -736,13 +792,20 @@ ggplotly(q_4_resp_plot(q_4_2_res, q_4_2, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_4_2_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_2)
+q_4_2_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_4_2)
 
 q_4_2_smry_tbl <- q_4_2_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_4_2 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -775,13 +838,20 @@ ggplotly(q_4_resp_plot(q_4_3_res, q_4_3, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_4_3_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_3)
+q_4_3_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_4_3)
 
 q_4_3_smry_tbl <- q_4_3_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_4_3 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -814,13 +884,20 @@ ggplotly(q_4_resp_plot(q_4_4_res, q_4_4, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_4_4_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_4)
+q_4_4_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_4_4)
 
 q_4_4_smry_tbl <- q_4_4_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_4_4 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -853,13 +930,20 @@ ggplotly(q_4_resp_plot(q_4_5_res, q_4_5, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_4_5_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_5)
+q_4_5_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_4_5)
 
 q_4_5_smry_tbl <- q_4_5_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_4_5 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
@@ -892,13 +976,20 @@ ggplotly(q_4_resp_plot(q_4_6_res, q_4_6, n))
 ### Summary 
 
 ```{r, include=FALSE}
-q_4_6_smry <- smry_df(wy_bilt, survey_number, response_id, q_8, q_4_6)
+q_4_6_smry <- smry_df(wy_bilt,
+                      survey_number,
+                      response_id,
+                      training_date,
+                      training_type,
+                      q_4_6)
 
 q_4_6_smry_tbl <- q_4_6_smry %>% 
   reactable(
     columns = list(
-      q_8 = colDef(name = "Position/Role",
-                   align = "center"),
+      training_date = colDef(name = "Date",
+                             align = "center"),
+      training_type = colDef(name = "Training",
+                             align = "center"),
       q_4_6 = colDef(name = "Response",
                      align = "center"),
       n = colDef(name = "Total",
