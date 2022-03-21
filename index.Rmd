@@ -338,17 +338,17 @@ q_3_df <- function(df, a, b, c) {
 
 q_3_1_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_1)
 
-q_3_sv_resp1 <- c("Strongly disagree",
+q_3_sv_resp1 <- c("Strongly Disagree",
                   "Disagree",
                   "Agree",
-                  "Strongly agree",
+                  "Strongly Agree",
                   "Not applicable because it was not covered in the training")
 
 q_3_sv_resp2 <- c("Not applicable because it\n was not covered in the training",
-                  "Strongly agree",
+                  "Strongly Agree",
                   "Agree",
                   "Disagree",
-                  "Strongly disagree")
+                  "Strongly Disagree")
 
 
 q_3_resp_plot <- function(df, a, b) {
