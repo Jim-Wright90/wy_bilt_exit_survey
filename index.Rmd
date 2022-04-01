@@ -665,6 +665,38 @@ q_3_7_res <- q_3_df(wy_bilt, survey_number, response_id, q_3_7)
 ggplotly(q_3_resp_plot(q_3_7_res, q_3_7, n))
 ```
 
+```{r, include=FALSE}
+q_3_resp_plot <- function(df, a, b) {
+ggplot(df, aes({{a}}, {{b}})) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_3_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  labs(x = "",
+       y = "Total Number of Responses")
+}
+
+q_3_resp_plot(q_3_1_res, q_3_1, n)
+
+head(q_3_7_res)
+
+q_3_7_res %>% 
+  ggplot(aes(q_3_7, n)) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_3_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  geom_text(aes(q_3_7, n, label = n),
+            color = "white",
+            nudge_y = -0.5) +
+  labs(x = "",
+       y = "Total Number of Responses",
+       title = "Overall, I found this event useful")  
+```
+
+
 ### Summary 
 
 ```{r, include=FALSE}
@@ -1004,6 +1036,22 @@ q_4_6_smry_tbl <- q_4_6_smry %>%
 
 ```{r, include=TRUE}
 q_4_6_smry_tbl
+```
+
+```{r, include=FALSE}
+q_4_6_res %>% 
+  ggplot(aes(q_4_6, n)) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_4_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  geom_text(aes(q_4_6, n, label = n),
+            color = "white",
+            nudge_y = -0.5) +
+  labs(x = "",
+       y = "Total Number of Responses",
+       title = "I would recommend the training to other potential participants")  
 ```
 
 # Additional Comments {data-icon="fa-comment"}
