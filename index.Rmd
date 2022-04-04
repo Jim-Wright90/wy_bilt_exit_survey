@@ -681,6 +681,17 @@ q_3_resp_plot(q_3_1_res, q_3_1, n)
 
 head(q_3_7_res)
 
+head(q_3_7_res)
+
+q_3_7_res2 <- q_3_7_res %>% 
+  mutate(pct = prop.table(n)) 
+
+q_3_7_res2$pct <- round(q_3_7_res2$pct, 4)
+
+q_3_7res3 <- q_3_7_res %>% 
+  mutate(perc = round(proportions(n) * 100, 1),
+         res = str_c(n, " (",perc, "%)"))
+
 q_3_7_res %>% 
   ggplot(aes(q_3_7, n)) +
   geom_col(fill = "#495E82") +
@@ -694,6 +705,26 @@ q_3_7_res %>%
   labs(x = "",
        y = "Total Number of Responses",
        title = "Overall, I found this event useful")  
+
+col_grid <- rgb(235, 235, 235, 100, maxColorValue = 255)
+
+
+q_3_7res3 %>% 
+  ggplot(aes(q_3_7, n)) +
+  geom_col(fill = "#495E82") +
+  scale_x_discrete(limits = q_3_sv_resp2) +
+  scale_y_continuous(limits = c(0, 15),
+                     breaks = c(0, 5, 10, 15)) +
+  coord_flip() +
+  geom_text(aes(q_3_7, n, label = res),
+            color = "black",
+            nudge_y = 1.15) +
+  labs(x = "",
+       y = "Total Number of Responses",
+       title = "Overall, I found this event useful") +
+  theme(panel.grid = element_line(color = col_grid))
+
+
 ```
 
 
@@ -1039,16 +1070,21 @@ q_4_6_smry_tbl
 ```
 
 ```{r, include=FALSE}
-q_4_6_res %>% 
+
+q_4_6_res2 <- q_4_6_res %>% 
+  mutate(perc = round(proportions(n) * 100, 1),
+         res = str_c(n, " (",perc, "%)"))
+
+q_4_6_res2 %>% 
   ggplot(aes(q_4_6, n)) +
   geom_col(fill = "#495E82") +
   scale_x_discrete(limits = q_4_sv_resp2) +
   scale_y_continuous(limits = c(0, 15),
                      breaks = c(0, 5, 10, 15)) +
   coord_flip() +
-  geom_text(aes(q_4_6, n, label = n),
-            color = "white",
-            nudge_y = -0.5) +
+  geom_text(aes(q_4_6, n, label = res),
+            color = "black",
+            nudge_y = 1.25) +
   labs(x = "",
        y = "Total Number of Responses",
        title = "I would recommend the training to other potential participants")  
